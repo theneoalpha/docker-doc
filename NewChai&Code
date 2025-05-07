@@ -1,0 +1,168 @@
+Docker Docs  
+
+Docker Images : (disk / software)  Docker container : (operating system)
+
+Q. From where we download images 
+	we use hub.docker.com ( which is hub of all the images, its open source area)
+
+
+
+
+Docker images command 
+
+* docker image ls          (to check all the images )
+* docker image prune      ( remove unused images)
+* docker run node           ( to run the image)    
+Docker containers command 
+
+* docker ps                  (to check all the containers)
+* docker container ls  (another command for same) 
+
+To run the container 
+
+* docker run —name  <container-name>  -d node       ( it will create a container which uses node image(software) 
+* docker run —name  <container-name> -d node:6.2.1   (it will use particular version of the node in that container)
+
+  
+
+To stop the container
+
+* docker stop <container-name>  (Stop container using container-name)
+* docker stop <container-id>   (stop container using container id)
+
+Command to remove unused (stopped) container
+
+* docker container prune  (it removed all stopped container)
+
+
+PORT Mapping - if we are moving same image with different versions then their internal port remain same for both and to make it different we use port mapping concept
+
+
+	eg . Mongo V 3.2.            and Mongo V3.4
+
+Because it takes its predefined PORt number but both have same image so both have same PORT
+
+
+
+
+
+Running container with port mapping
+
+
+
+    * docker run —name <container-name> -p 4000:27017 -d mongo                                                                                      
+    *                                                                     (New port) : (default port) 
+
+
+*     docker run —name <container-2-with-same-image> -p 5001:27017 -d mongo            
+
+
+
+
+
+Docker logs
+
+
+* docker  logs  <container-name>
+
+
+Docker multi- things
+
+Lets  pass in multi line (multiple things pass using this method) using “\” we can give extra things in multiple line
+
+* docker run -d    \ -p 8081:8081  \ -e ENV_NAME=test \ -e ENV_PLACE=place \     
+Docker Compose 
+
+In production level there are nth number of containers and to manage in proper way we use docker-compose.yaml file which manages all the container processing 
+
+
+Steps to configure docker-compose file
+
+* Step 1 : Create docker-compose.yaml  file  (highly dependent on indentation)
+* When we run the docker-compose file then it create single Network and put all the containers into that
+
+
+   Step 2 :   Docker-compose.yaml file
+
+		version:’3’
+		services:								// we wrote all the container 
+			mongoldb:                   				//  container 1 
+
+				image:mongo					// image which container 1 use
+				ports: 
+					- “27017:27017”			// exposing the port
+				environment :
+					- ENV_NAME=test			// defining the environment
+					- ENV_PLACE=test
+			
+ 
+			mongo-express:                                  // container 2
+				image: mongo-express             // image which is needed in that container
+                               Port:                                		-“8080:8080”                     // exposing the port
+				environment : 					- ENV_NAME=tst2 					- ENV_PLACE=hger
+   
+
+
+
+
+
+
+	Step 3 : lets Run our compose file
+
+			docker-compose -f docker-compose.yaml up		
+
+
+
+Dominating image / Depending Images
+	if we have multiple images and if some image is dependent ( run only after the successfully running the another image) then we can do it by simply passing 
+
+
+	Steps to achieve this
+
+		pass “restart : always” in dependent image , which keeps restarting multiple times 
+
+	eg .         Mongo-express: 			  image: mongo-express 			  restart: always                 // this line is important 			  ports:	
+			    - “8081:8081” 
+
+
+
+
+
+
+
+
+
+
+
+
+DOCKERFILE & docker-compose.yaml
+
+
+Dockerfile is used to create image and its configuration
+
+Docker-compose.yaml is used to run the multiple image using single click and manage properly
+
+
+
+
+STEP 1: Docker Image structure ( Dockerfile)
+
+
+
+FROM  node:slim                                 // base image
+WORKDIR /app.                              // path in container
+COPY . /app                                   // copying current page COPY <source-code-path> 	<destination-path>
+RUN npm install                                // running script
+EXPOSE  3000                                 // exposing the port CMD node index.js                          // Command to run the project
+
+
+
+
+STEP 2 : Lets create image with required configuration
+
+	docker built -t <your-image-name>.  // build image in Dockerfile location
+        Docker run -p 4173:4173 <your-image-name>   
+
+
+  
+
